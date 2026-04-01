@@ -1,0 +1,13 @@
+{
+  "categories": [
+    "GeneralAnalysis"
+  ],
+  "templates": [
+    {
+      "template_id": "1774712742428",
+      "category": "GeneralAnalysis",
+      "title": "Sentiment Extractor",
+      "text": "Extract the core emotion from: {{input}}"
+    }
+  ]
+}

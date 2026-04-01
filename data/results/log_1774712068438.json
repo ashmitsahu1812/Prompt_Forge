@@ -1,0 +1,26 @@
+{
+  "execution_id": "1774712068438",
+  "prompt_id": "1774711535370",
+  "version_id": "v1",
+  "suite_id": "1774712001366",
+  "model": "google-t5/t5-base",
+  "results": [
+    {
+      "input": "The product is amazing!",
+      "output": "{\"error\":\"https://api-inference.huggingface.co is no longer supported. Please use https://router.huggingface.co instead.\"}",
+      "timestamp": "2026-03-28T15:34:26.312Z",
+      "rating": 5
+    },
+    {
+      "input": "I hate the battery life.",
+      "output": "{\"error\":\"https://api-inference.huggingface.co is no longer supported. Please use https://router.huggingface.co instead.\"}",
+      "timestamp": "2026-03-28T15:34:27.921Z"
+    },
+    {
+      "input": "It's okay, could be better.",
+      "output": "{\"error\":\"https://api-inference.huggingface.co is no longer supported. Please use https://router.huggingface.co instead.\"}",
+      "timestamp": "2026-03-28T15:34:28.438Z"
+    }
+  ],
+  "total_latency": 3881
+}
