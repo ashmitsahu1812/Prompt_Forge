@@ -32,7 +32,7 @@ Return your response in strict JSON format like this:
 }`;
 
     // Use the free Serverless Inference API endpoint
-    const hfUrl = `https://api-inference.huggingface.co/v1/chat/completions`;
+    const hfUrl = `https://router.huggingface.co/v1/chat/completions`;
 
     const response = await fetch(hfUrl, {
       headers: { 

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const startTime = Date.now();
 
     // Use the free Serverless Inference API endpoint
-    const hfUrl = `https://api-inference.huggingface.co/v1/chat/completions`;
+    const hfUrl = `https://router.huggingface.co/v1/chat/completions`;
 
     for (const input of suite.inputs) {
       let finalPrompt = version.prompt_text;
