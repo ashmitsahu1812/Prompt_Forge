@@ -32,11 +32,21 @@ export async function POST(req: NextRequest) {
     const results = [];
     const startTime = Date.now();
 
-    // Use the OpenAI-compatible HF Router endpoint
-    const hfUrl = `https://router.huggingface.co/v1/chat/completions`;
+    // Use the free Serverless Inference API endpoint
+    const hfUrl = `https://api-inference.huggingface.co/v1/chat/completions`;
 
     for (const input of suite.inputs) {
-      const finalPrompt = version.prompt_text.replace('{{input}}', input);
+      let finalPrompt = version.prompt_text;
+      
+      // Handle Multi-Variable Replacement
+      if (typeof input === 'object' && input !== null) {
+        Object.entries(input).forEach(([key, value]) => {
+          finalPrompt = finalPrompt.replaceAll(`{{${key}}}`, value as string);
+        });
+      } else {
+        // Fallback for legacy string-based inputs
+        finalPrompt = finalPrompt.replaceAll('{{input}}', String(input));
+      }
       
       try {
         const response = await fetch(hfUrl, {

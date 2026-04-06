@@ -49,49 +49,55 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <div className="space-y-16 lg:space-y-24 opacity-0 animate-[fadeIn_0.7s_ease-out_forwards]">
+    <div className="space-y-20 lg:space-y-32 fade-in">
       
       {/* HERO SECTION */}
-      <section className="relative py-12 lg:py-20 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-3xl space-y-8 stagger-in">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-             System Status: Operational
+      <section className="relative py-16 lg:py-28 overflow-hidden">
+        <div className="max-w-4xl space-y-10 stagger-in relative z-10">
+          <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-electric-500/10 border border-electric-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-electric-500 shadow-glow">
+             <span className="relative flex h-2 w-2">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-electric-400 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-2 w-2 bg-electric-500"></span>
+             </span>
+             <span>Neural Engine: Online</span>
           </div>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-            Next-Gen <span className="text-gradient">Prompt Orchestration</span>
+          <h1 className="text-6xl lg:text-8xl font-black text-foreground tracking-tighter leading-[0.9] font-display">
+            The Digital <span className="text-electric-500 text-glow">Loom</span> <br/>
+            for AI Logic
           </h1>
-          <p className="text-lg lg:text-xl text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-            Streamline your prompt engineering workflow with high-fidelity logic auditing and neural blueprinting. Professional tools for modern AI orchestration.
+          <p className="text-xl lg:text-2xl text-neural-400 leading-relaxed font-medium max-w-2xl">
+            Architect, audit, and orchestrate high-fidelity prompt structures. Professional-grade tools for the next generation of AI engineers.
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
+          <div className="flex flex-wrap gap-6 pt-6">
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="btn-primary"
+              className="btn-premium"
             >
-              <span>Create Blueprint</span>
+              <span>Initialize Blueprint</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
             </button>
-            <button className="btn-secondary">
-              View Documentation
+            <button className="px-8 py-4 rounded-2xl font-bold bg-neural-100 dark:bg-neural-900 border border-border dark:border-white/5 hover:border-electric-500/30 transition-all">
+              Documentation
             </button>
           </div>
         </div>
       </section>
 
       {/* METRICS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading ? (
-          [1, 2, 3].map(i => <div key={i} className="h-40 skeleton" />)
+          [1, 2, 3].map(i => <div key={i} className="h-44 card-premium skeleton" />)
         ) : (
           [
-            { label: 'Blueprints', val: prompts.length, color: 'text-blue-600 dark:text-blue-400', sub: 'Deployment Ready' },
-            { label: 'Versions', val: prompts.reduce((acc, p) => acc + p.versions.length, 0), color: 'text-indigo-600 dark:text-indigo-400', sub: 'Version Controllable' },
-            { label: 'Latency', val: '~1.1s', color: 'text-emerald-600 dark:text-emerald-400', sub: 'Optimized Routing' }
+            { label: 'Neural Blueprints', val: prompts.length, color: 'text-electric-500', sub: 'Deployment Ready' },
+            { label: 'Total Artifacts', val: prompts.reduce((acc, p) => acc + p.versions.length, 0), color: 'text-neon-500', sub: 'Versioned Assets' },
+            { label: 'System Latency', val: '1.2ms', color: 'text-emerald-500', sub: 'Optimized Logic' }
           ].map((stat, i) => (
-            <div key={i} className="card-clean group">
-              <div className="flex flex-col space-y-4">
-                <span className="badge w-fit">{stat.label}</span>
-                <div className={`text-5xl font-bold ${stat.color} tracking-tight`}>{stat.val}</div>
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{stat.sub}</div>
+            <div key={i} className="card-premium group hover:border-electric-500/30">
+              <div className="flex flex-col space-y-6">
+                <span className="text-[10px] font-black text-neural-400 uppercase tracking-[0.2em]">{stat.label}</span>
+                <div className={`text-6xl font-black ${stat.color} tracking-tighter font-display text-glow`}>{stat.val}</div>
+                <div className="text-[10px] font-bold text-neural-400 uppercase tracking-widest opacity-60 italic">{stat.sub}</div>
               </div>
             </div>
           ))
@@ -99,47 +105,62 @@ export default function Home() {
       </div>
 
       {/* REGISTRY */}
-      <section className="space-y-10 pb-20">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Active Registry</h2>
-          <span className="text-sm font-medium text-slate-500">{loading ? '...' : prompts.length} Blueprints Active</span>
+      <section className="space-y-12 pb-32">
+        <div className="flex items-end justify-between border-b border-border dark:border-white/5 pb-8">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black text-foreground tracking-tight font-display">Active Registry</h2>
+            <p className="text-sm text-neural-400 font-medium italic">Validated architectures currently in workspace</p>
+          </div>
+          <div className="text-right">
+            <span className="text-4xl font-black text-foreground font-display">{loading ? '...' : prompts.length}</span>
+            <div className="text-[10px] font-black text-neural-400 uppercase tracking-widest mt-1">Found Instances</div>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {loading ? (
-            [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-64 skeleton" />)
+            [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-72 card-premium skeleton" />)
           ) : (
             <>
               {prompts.length === 0 ? (
-                <div className="col-span-full py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-300 mb-2">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                <div className="col-span-full py-32 card-premium border-dashed border-2 flex flex-col items-center justify-center text-center space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-neural-50 dark:bg-neural-900 flex items-center justify-center text-neural-200 mb-2">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Registry Empty</h3>
-                  <p className="text-slate-500 max-w-sm">No active blueprints found in your workspace. Initialize your first architecture to begin orchestration.</p>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black text-foreground tracking-tight font-display">Registry Depleted</h3>
+                    <p className="text-neural-400 max-w-sm font-medium">No active architectures detected. Initialize a logic loom to begin your workflow.</p>
+                  </div>
                 </div>
               ) : (
                 prompts.map((prompt) => (
                   <Link key={prompt.prompt_id} href={`/prompts/${prompt.prompt_id}`} className="group">
-                    <div className="card-clean h-full flex flex-col justify-between">
-                      <div className="space-y-6">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            ID-{prompt.prompt_id.slice(-4).toUpperCase()}
-                          </span>
-                          <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-all">
+                    <div className="card-premium h-full flex flex-col justify-between hover:bg-neural-50/50 dark:hover:bg-neural-900/50">
+                      <div className="space-y-8">
+                        <div className="flex justify-between items-center">
+                          <div className="px-3 py-1 bg-neural-50 dark:bg-neural-950/50 rounded-lg border border-border dark:border-white/5 text-[9px] font-black text-neural-400 uppercase tracking-widest group-hover:border-electric-500/30 group-hover:text-electric-500 transition-colors">
+                            ID-{prompt.prompt_id.slice(-6).toUpperCase()}
+                          </div>
+                          <div className="w-10 h-10 rounded-xl bg-neural-50 dark:bg-neural-950 flex items-center justify-center text-neural-300 group-hover:text-electric-500 group-hover:bg-electric-500/10 group-hover:scale-110 transition-all duration-500">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{prompt.title}</h3>
-                          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">{prompt.description}</p>
+                        <div className="space-y-4">
+                          <h3 className="text-2xl font-black text-foreground group-hover:text-electric-500 transition-colors font-display tracking-tight leading-[1.1]">{prompt.title}</h3>
+                          <p className="text-base text-neural-400 leading-relaxed line-clamp-3 font-medium opacity-80">{prompt.description}</p>
                         </div>
                       </div>
-                      <div className="pt-8 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-100 dark:border-blue-800">{prompt.current_version}</span>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{prompt.versions.length} Artifacts</span>
+                      <div className="pt-8 mt-10 border-t border-border dark:border-white/5 flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-neural-500 uppercase tracking-widest">Version</span>
+                            <span className="text-sm font-black text-electric-500 font-display">{prompt.current_version}</span>
+                          </div>
+                          <div className="w-px h-8 bg-border dark:bg-white/5 mx-2" />
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-neural-500 uppercase tracking-widest">Artifacts</span>
+                            <span className="text-sm font-black text-foreground font-display">{prompt.versions.length}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -149,12 +170,15 @@ export default function Home() {
               
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="group card-clean border-dashed border-2 flex flex-col items-center justify-center space-y-4 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-blue-200 min-h-[280px]"
+                className="group card-premium border-dashed border-2 flex flex-col items-center justify-center space-y-6 hover:bg-neural-50/50 dark:hover:bg-neural-900/50 hover:border-electric-500/40 min-h-[320px] transition-all duration-500"
               >
-                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-600 group-hover:scale-110 transition-all">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                <div className="w-16 h-16 rounded-2xl bg-neural-50 dark:bg-neural-950 flex items-center justify-center text-neural-400 group-hover:text-electric-500 group-hover:scale-110 transition-all duration-500 shadow-inner">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                 </div>
-                <span className="text-sm font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Add Blueprint</span>
+                <div className="text-center space-y-1">
+                   <div className="text-sm font-black text-foreground uppercase tracking-[0.2em]">New Thread</div>
+                   <div className="text-[10px] font-bold text-neural-400 uppercase tracking-widest opacity-60">Initialize Architecture</div>
+                </div>
               </button>
             </>
           )}
@@ -163,34 +187,42 @@ export default function Home() {
 
       {/* CREATE MODAL */}
       {isModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">New Blueprint</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+        <div className="fixed inset-0 bg-neural-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-[fadeIn_0.3s_ease-out_forwards]" onClick={() => setIsModalOpen(false)}>
+          <div className="card-premium w-full max-w-xl shadow-2xl animate-[zoomIn_0.3s_ease-out_forwards]" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-12">
+              <div className="space-y-1">
+                <h2 className="text-3xl font-black text-foreground uppercase tracking-tight font-display">New Blueprint</h2>
+                <p className="text-[10px] font-bold text-neural-400 uppercase tracking-[0.3em]">Phase 01: Initialization</p>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 text-neural-400 hover:text-foreground transition-colors hover:bg-neural-100 dark:hover:bg-white/5 rounded-xl">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <form onSubmit={handleCreate} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Architecture Title</label>
+            <form onSubmit={handleCreate} className="space-y-10">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-neural-400 uppercase tracking-[0.3em] pl-1">Architecture Title</label>
                 <input 
                   autoFocus
                   type="text" 
                   value={newPromptData.title}
                   onChange={e => setNewPromptData({...newPromptData, title: e.target.value})}
-                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
-                  placeholder="e.g. Technical Documentation Engine"
+                  className="input-forge !py-5 !px-6 !text-lg"
+                  placeholder="e.g. Technical Nexus v1.0"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Description</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-neural-400 uppercase tracking-[0.3em] pl-1">Objective Summary</label>
                 <textarea 
                   value={newPromptData.description}
                   onChange={e => setNewPromptData({...newPromptData, description: e.target.value})}
-                  className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium h-32 resize-none"
-                  placeholder="Brief summary of this prompt's objective..."
+                  className="input-forge !h-40 !py-5 !px-6 !text-lg resize-none"
+                  placeholder="Define the primary logic of this blueprint..."
                 />
               </div>
-              <button type="submit" className="w-full btn-primary !py-4 shadow-blue-500/20 shadow-lg">Initialize Architecture</button>
+              <button type="submit" className="w-full btn-premium !py-5 shadow-2xl">
+                <span>Deploy Blueprint</span>
+                <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </button>
             </form>
           </div>
         </div>

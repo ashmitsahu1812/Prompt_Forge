@@ -1,97 +1,279 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #2563eb;
-  --color-secondary: #64748b;
-  --color-bg-subtle: #f8fafc;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif;
+
+  /* Neural color palette — mapped to slate */
+  --color-neural-950: #020617;
+  --color-neural-900: #0f172a;
+  --color-neural-800: #1e293b;
+  --color-neural-700: #334155;
+  --color-neural-500: #64748b;
+  --color-neural-400: #94a3b8;
+  --color-neural-300: #cbd5e1;
+  --color-neural-200: #e2e8f0;
+  --color-neural-100: #f1f5f9;
+  --color-neural-50: #f8fafc;
+
+  /* Accent colors */
+  --color-electric-500: #3b82f6;
+  --color-electric-400: #60a5fa;
+  --color-neon-500: #6366f1;
+  --color-neon-400: #818cf8;
 }
 
+/* ============================================
+   DESIGN TOKENS — always dark by default
+   ============================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  --background: #020617;
+  --foreground: #f1f5f9;
+  --card: #0f172a;
+  --card-hover: #1e293b;
+  --border: rgba(255,255,255,0.07);
+  --muted: #94a3b8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-  }
+/* ============================================
+   BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
 }
 
 body {
-  @apply text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950 font-sans selection:bg-blue-500/20 antialiased;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02","cv03","cv04","cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* CLEAN UI SYSTEM */
-
-.card-clean {
-  @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 lg:p-8 shadow-sm transition-all duration-300;
+::selection {
+  background-color: rgba(59, 130, 246, 0.25);
 }
 
-.card-clean:hover {
-  @apply shadow-md border-blue-500/20;
-}
-
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all active:scale-[0.98] shadow-sm flex items-center justify-center;
-}
-
-.btn-secondary {
-  @apply bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 px-6 py-3 rounded-xl font-semibold transition-all shadow-sm;
-}
-
-.nav-link {
-  @apply flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 transition-all font-medium;
-}
-
-.nav-link-active {
-  @apply bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold;
-}
-
-.badge {
-  @apply px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700;
-}
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { @apply bg-transparent; }
-::-webkit-scrollbar-thumb { @apply bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700; }
-
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
-}
-
-/* ANIMATIONS & LOADING */
-.stagger-in {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: slide-up 0.5s ease-out forwards;
-}
-
-@keyframes slide-up {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.skeleton {
-  @apply bg-slate-100 dark:bg-slate-800 animate-pulse rounded-lg;
-}
-
-/* MODAL SYSTEM */
-.modal-overlay {
-  @apply fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-6;
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-.modal-content {
-  @apply bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl p-8 lg:p-10 shadow-2xl border border-slate-200 dark:border-slate-800;
-  animation: zoomIn 0.3s ease-out forwards;
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-20px) scale(1.05); }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes zoomIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+.animate-float       { animation: float 10s ease-in-out infinite; }
+.animate-fade-in     { animation: fadeIn 0.7s ease-out forwards; }
+.animate-stagger-in  { animation: staggerIn 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* Helper classes — start invisible, animation reveals */
+.fade-in    { opacity: 0; animation: fadeIn    0.7s ease-out forwards; }
+.stagger-in { opacity: 0; animation: staggerIn 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+.glass-panel {
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card-premium {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(99,102,241,0.04));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.card-premium:hover {
+  border-color: rgba(59,130,246,0.2);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.1);
+  transform: translateY(-2px);
+}
+
+.card-premium:hover::before { opacity: 1; }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-premium {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: #3b82f6;
+  color: #ffffff;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.35);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.btn-premium > * { position: relative; z-index: 1; }
+
+.btn-premium:hover {
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 12px 40px rgba(59,130,246,0.5);
+}
+
+.btn-premium:hover::after { opacity: 1; }
+.btn-premium:active { transform: scale(0.98); }
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.nav-link-premium {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 1rem;
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: all 0.25s ease;
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-link-premium:hover {
+  color: #f1f5f9;
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-link-active-premium {
+  background: rgba(255,255,255,0.07);
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+.nav-link-active-premium::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.5rem;
+  background: #3b82f6;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 12px rgba(59,130,246,0.6);
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.input-forge {
+  width: 100%;
+  background: rgba(15,23,42,0.8);
+  border: 2px solid rgba(255,255,255,0.07);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  color: #f1f5f9;
+  font-family: 'ui-monospace', 'SFMono-Regular', monospace;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.input-forge:focus {
+  border-color: rgba(59,130,246,0.4);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+  background: rgba(15,23,42,1);
+}
+
+.input-forge::placeholder { color: rgba(148,163,184,0.4); }
+
+/* ============================================
+   SKELETON LOADING
+   ============================================ */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   TYPOGRAPHY HELPERS
+   ============================================ */
+.text-glow {
+  text-shadow: 0 0 24px rgba(59, 130, 246, 0.5),
+               0 0 48px rgba(59, 130, 246, 0.2);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar            { width: 4px; height: 4px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: rgba(255,255,255,0.1); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover{ background: rgba(59,130,246,0.4); }

@@ -1,0 +1,20 @@
+{
+  "execution_id": "1775451566204",
+  "prompt_id": "1774711535370",
+  "version_id": "v6",
+  "suite_id": "001",
+  "model": "meta-llama/Llama-3.2-1B-Instruct",
+  "results": [
+    {
+      "input": "Test input 1...",
+      "output": "{\"error\":\"You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers. Alternatively, subscribe to PRO to get 20x more included usage.\"}",
+      "timestamp": "2026-04-06T04:59:25.770Z"
+    },
+    {
+      "input": "Test input 2...",
+      "output": "{\"error\":\"You have depleted your monthly included credits. Purchase pre-paid credits to continue using Inference Providers. Alternatively, subscribe to PRO to get 20x more included usage.\"}",
+      "timestamp": "2026-04-06T04:59:26.204Z"
+    }
+  ],
+  "total_latency": 784
+}

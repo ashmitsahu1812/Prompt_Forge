@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+::selection {
+  background: rgba(139, 92, 246, 0.4); /* AI Purple selection */
+  color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0e1015; /* Base dark canvas */
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+button, input, textarea, a {
+  font-family: inherit;
+  color: inherit;
+}

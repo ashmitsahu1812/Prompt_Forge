@@ -1,0 +1,20 @@
+{
+  "execution_id": "1775451520812",
+  "prompt_id": "001",
+  "version_id": "v1",
+  "suite_id": "001",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "results": [
+    {
+      "input": "Test input 1...",
+      "output": "{\"error\":{\"message\":\"The requested model 'Qwen/Qwen2.5-1.5B-Instruct' is not supported by any provider you have enabled.\",\"type\":\"invalid_request_error\",\"param\":\"model\",\"code\":\"model_not_supported\"}}",
+      "timestamp": "2026-04-06T04:58:40.542Z"
+    },
+    {
+      "input": "Test input 2...",
+      "output": "{\"error\":{\"message\":\"The requested model 'Qwen/Qwen2.5-1.5B-Instruct' is not supported by any provider you have enabled.\",\"type\":\"invalid_request_error\",\"param\":\"model\",\"code\":\"model_not_supported\"}}",
+      "timestamp": "2026-04-06T04:58:40.812Z"
+    }
+  ],
+  "total_latency": 720
+}

@@ -88,10 +88,12 @@ export function deletePrompt(promptId: string) {
   }
 }
 
+export type TestCase = Record<string, string>;
+
 export type TestSuite = {
   suite_id: string;
   name: string;
-  inputs: string[];
+  inputs: (string | TestCase)[];
 };
 
 export function getAllTestSuites(): TestSuite[] {
@@ -103,7 +105,24 @@ export function getAllTestSuites(): TestSuite[] {
     .filter(file => file.endsWith('.json'))
     .map(file => {
       const content = fs.readFileSync(path.join(suitesDir, file), 'utf8');
-      return JSON.parse(content);
+      const data = JSON.parse(content);
+      
+      // Migration logic: Ensure all inputs are parsed correctly
+      if (Array.isArray(data.inputs)) {
+        data.inputs = data.inputs.map((input: any) => {
+          if (typeof input === 'string') {
+            // String found, convert to Record if it looks like JSON or leave as string for backward compatibility
+            try {
+              if (input.trim().startsWith('{') && input.trim().endsWith('}')) {
+                return JSON.parse(input);
+              }
+            } catch (e) {}
+          }
+          return input;
+        });
+      }
+      
+      return data;
     });
 }
 

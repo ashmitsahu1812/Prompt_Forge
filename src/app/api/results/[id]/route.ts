@@ -20,7 +20,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { result_index, rating } = await req.json();
+  const { result_index, rating, ai_grade } = await req.json();
 
   const log = getExecutionLog(id);
   if (!log) {
@@ -28,7 +28,8 @@ export async function PATCH(
   }
 
   if (log.results[result_index]) {
-    log.results[result_index].rating = rating;
+    if (rating !== undefined) log.results[result_index].rating = rating;
+    if (ai_grade !== undefined) log.results[result_index].ai_grade = ai_grade;
     saveExecutionLog(log);
   }
 
