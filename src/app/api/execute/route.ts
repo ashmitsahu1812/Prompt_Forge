@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPrompt, getAllTestSuites } from '@/lib/data';
+import { getPrompt, getAllTestSuites, DATA_DIR } from '@/lib/data';
 import fs from 'fs';
 import path from 'path';
 
 const HF_TOKEN = process.env.HF_TOKEN;
-const DATA_DIR = path.join(process.cwd(), 'data');
-
 export async function POST(req: NextRequest) {
   try {
     const { 
