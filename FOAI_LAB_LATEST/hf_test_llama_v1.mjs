@@ -1,4 +1,6 @@
-const token = "YOUR_HF_TOKEN_HERE";
+// Load token from environment variable: HF_TOKEN=your_token node hf_test_llama_v1.mjs
+const token = process.env.HF_TOKEN;
+if (!token) { console.error("ERROR: Set the HF_TOKEN environment variable first.\n  e.g. HF_TOKEN=hf_xxx node hf_test_llama_v1.mjs"); process.exit(1); }
 
 async function query() {
   const url = "https://router.huggingface.co/hf-inference/v1/chat/completions";
