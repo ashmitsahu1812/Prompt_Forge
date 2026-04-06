@@ -23,15 +23,10 @@ export async function POST(req: NextRequest) {
     const suite = suites.find(s => s.suite_id === suite_id);
     if (!suite) return NextResponse.json({ error: 'Suite not found' }, { status: 404 });
 
-    if (!HF_TOKEN) {
-      return NextResponse.json({ error: 'HF_TOKEN not configured in .env' }, { status: 500 });
-    }
-
     const results = [];
     const startTime = Date.now();
 
-    // Use the free Serverless Inference API endpoint
-    const hfUrl = `https://router.huggingface.co/v1/chat/completions`;
+    const apiUrl = `https://text.pollinations.ai/`;
 
     for (const input of suite.inputs) {
       let finalPrompt = version.prompt_text;
@@ -47,27 +42,17 @@ export async function POST(req: NextRequest) {
       }
       
       try {
-        const response = await fetch(hfUrl, {
-          headers: { 
-            Authorization: `Bearer ${HF_TOKEN}`, 
-            "Content-Type": "application/json" 
-          },
+        const response = await fetch(apiUrl, {
+          headers: { "Content-Type": "application/json" },
           method: "POST",
           body: JSON.stringify({ 
-            model: model,
             messages: [{ role: "user", content: finalPrompt }],
-            max_tokens: 500
+            jsonMode: false,
+            model: "llama"
           }),
         });
 
-        const data = await response.json();
-        
-        let outputText = "";
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-          outputText = data.choices[0].message.content;
-        } else {
-          outputText = JSON.stringify(data);
-        }
+        const outputText = await response.text();
 
         results.push({
           input,

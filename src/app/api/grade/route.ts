@@ -10,10 +10,6 @@ export async function POST(req: NextRequest) {
       model = "meta-llama/Llama-3.2-1B-Instruct" 
     } = await req.json();
 
-    if (!HF_TOKEN) {
-      return NextResponse.json({ error: 'HF_TOKEN not configured' }, { status: 500 });
-    }
-
     const gradingSystemPrompt = `You are a professional AI Output Grader. 
 Evaluate the following AI-generated output based on the provided rubric.
 Give a numerical score from 1 to 10 and provide concise justifications.
@@ -31,39 +27,32 @@ Return your response in strict JSON format like this:
   "justification": "The output is clear and follows the rubric but lacks depth in the explanation."
 }`;
 
-    // Use the free Serverless Inference API endpoint
-    const hfUrl = `https://router.huggingface.co/v1/chat/completions`;
+    const apiUrl = `https://text.pollinations.ai/`;
 
-    const response = await fetch(hfUrl, {
-      headers: { 
-        Authorization: `Bearer ${HF_TOKEN}`, 
-        "Content-Type": "application/json" 
-      },
+    const response = await fetch(apiUrl, {
+      headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify({ 
-        model: model,
+        model: "llama",
         messages: [{ role: "system", content: gradingSystemPrompt }],
-        max_tokens: 300,
-        response_format: { type: "json_object" }
+        jsonMode: true
       }),
     });
 
-    const data = await response.json();
+    const content = await response.text();
     
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      const content = data.choices[0].message.content;
-      try {
-        const gradeResult = JSON.parse(content);
-        return NextResponse.json(gradeResult);
-      } catch (e) {
-        return NextResponse.json({ 
-          score: 0, 
-          justification: "Failed to parse grader response: " + content 
-        });
-      }
+    try {
+      const gradeResult = JSON.parse(content);
+      return NextResponse.json({
+        score: gradeResult.score || 0,
+        justification: gradeResult.justification || "No justification provided."
+      });
+    } catch (e) {
+      return NextResponse.json({ 
+        score: 0, 
+        justification: "Failed to parse grader response: " + content 
+      });
     }
-
-    return NextResponse.json({ error: 'Failed to get grading response' }, { status: 500 });
 
   } catch (error) {
     console.error('Grading error:', error);
