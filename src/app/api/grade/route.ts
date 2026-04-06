@@ -27,19 +27,26 @@ Return your response in strict JSON format like this:
   "justification": "The output is clear and follows the rubric but lacks depth in the explanation."
 }`;
 
-    const apiUrl = `https://text.pollinations.ai/`;
+    const apiUrl = `https://text.pollinations.ai/openai/v1/chat/completions`;
 
     const response = await fetch(apiUrl, {
       headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify({ 
-        model: "llama",
+        model: "openai",
         messages: [{ role: "system", content: gradingSystemPrompt }],
         jsonMode: true
       }),
     });
 
-    const content = await response.text();
+    const data = await response.json();
+    
+    let content = "";
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      content = data.choices[0].message.content;
+    } else {
+      content = JSON.stringify(data);
+    }
     
     try {
       const gradeResult = JSON.parse(content);

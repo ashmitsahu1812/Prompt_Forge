@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const results = [];
     const startTime = Date.now();
 
-    const apiUrl = `https://text.pollinations.ai/`;
+    const apiUrl = `https://text.pollinations.ai/openai/v1/chat/completions`;
 
     for (const input of suite.inputs) {
       let finalPrompt = version.prompt_text;
@@ -47,12 +47,18 @@ export async function POST(req: NextRequest) {
           method: "POST",
           body: JSON.stringify({ 
             messages: [{ role: "user", content: finalPrompt }],
-            jsonMode: false,
-            model: "llama"
+            model: "openai"
           }),
         });
 
-        const outputText = await response.text();
+        const data = await response.json();
+        
+        let outputText = "";
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          outputText = data.choices[0].message.content;
+        } else {
+          outputText = JSON.stringify(data);
+        }
 
         results.push({
           input,
