@@ -109,6 +109,15 @@ export default function Login() {
               </Link>
             </p>
           </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 p-4 bg-neon-500/5 border border-neon-500/20 rounded-xl">
+            <h3 className="text-sm font-bold text-neon-500 mb-2">Demo Credentials</h3>
+            <div className="text-xs text-neural-400 space-y-1">
+              <p><strong>Email:</strong> admin@promptforge.dev</p>
+              <p><strong>Password:</strong> admin123</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

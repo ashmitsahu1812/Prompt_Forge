@@ -1,8 +1,6 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
 
 // User interface
 export interface User {
@@ -21,38 +19,47 @@ export interface User {
   };
 }
 
-// Database functions
-const usersFile = join(process.cwd(), 'data', 'users.json');
+// In-memory storage for Vercel (temporary solution)
+// In production, you'd use a real database like PostgreSQL, MongoDB, etc.
+let users: User[] = [];
 
-function ensureUsersFile() {
-  if (!existsSync(usersFile)) {
-    // Start with empty users array - no demo account
-    writeFileSync(usersFile, JSON.stringify([], null, 2));
+// Initialize with a default admin user for demo purposes
+function initializeUsers() {
+  if (users.length === 0) {
+    const defaultAdmin: User = {
+      id: 'admin_001',
+      email: 'admin@promptforge.dev',
+      name: 'Admin User',
+      password: bcrypt.hashSync('admin123', 12),
+      role: 'admin',
+      created_at: new Date().toISOString(),
+      preferences: {
+        theme: 'dark',
+        notifications: true,
+        auto_save: true
+      }
+    };
+    users.push(defaultAdmin);
   }
 }
 
 export function getAllUsers(): User[] {
-  ensureUsersFile();
-  try {
-    const data = readFileSync(usersFile, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+  initializeUsers();
+  return users;
 }
 
 export function getUserByEmail(email: string): User | null {
-  const users = getAllUsers();
+  initializeUsers();
   return users.find(user => user.email === email) || null;
 }
 
 export function getUserById(id: string): User | null {
-  const users = getAllUsers();
+  initializeUsers();
   return users.find(user => user.id === id) || null;
 }
 
 export function createUser(userData: Omit<User, 'id' | 'created_at'>): User {
-  const users = getAllUsers();
+  initializeUsers();
 
   // Check if user already exists
   if (users.some(u => u.email === userData.email)) {
@@ -67,18 +74,16 @@ export function createUser(userData: Omit<User, 'id' | 'created_at'>): User {
   };
 
   users.push(newUser);
-  writeFileSync(usersFile, JSON.stringify(users, null, 2));
 
   return newUser;
 }
 
 export function updateUserLastLogin(userId: string) {
-  const users = getAllUsers();
+  initializeUsers();
   const userIndex = users.findIndex(u => u.id === userId);
 
   if (userIndex !== -1) {
     users[userIndex].last_login = new Date().toISOString();
-    writeFileSync(usersFile, JSON.stringify(users, null, 2));
   }
 }
 
@@ -143,5 +148,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login'
   },
-  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key-change-in-production'
+  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key-change-in-production',
+  debug: process.env.NODE_ENV === 'development'
 };
