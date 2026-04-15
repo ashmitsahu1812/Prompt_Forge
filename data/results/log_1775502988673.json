@@ -1,0 +1,20 @@
+{
+  "execution_id": "1775502988673",
+  "prompt_id": "001",
+  "version_id": "v1",
+  "suite_id": "001",
+  "model": "mistralai/Mistral-7B-Instruct-v0.3",
+  "results": [
+    {
+      "input": "Test input 1...",
+      "output": "{\"error\":\"Model not found: llama. This is our legacy API - for the full model list and new features, visit https://enter.pollinations.ai\",\"status\":404,\"deprecation_notice\":\"NOTE: The Pollinations legacy text API is being deprecated for authenticated users. Please migrate to https://enter.pollinations.ai for better performance and access to all the latest models. Anonymous requests to text.pollinations.ai are NOT affected.\"}",
+      "timestamp": "2026-04-06T19:15:58.682Z"
+    },
+    {
+      "input": "Test input 2...",
+      "output": "{\"error\":\"Model not found: llama. This is our legacy API - for the full model list and new features, visit https://enter.pollinations.ai\",\"status\":404,\"deprecation_notice\":\"NOTE: The Pollinations legacy text API is being deprecated for authenticated users. Please migrate to https://enter.pollinations.ai for better performance and access to all the latest models. Anonymous requests to text.pollinations.ai are NOT affected.\"}",
+      "timestamp": "2026-04-06T19:16:28.673Z"
+    }
+  ],
+  "total_latency": 62358
+}

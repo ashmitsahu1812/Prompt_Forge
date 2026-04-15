@@ -31,16 +31,21 @@
   --foreground: #f1f5f9;
   --card: #0f172a;
   --card-hover: #1e293b;
-  --border: rgba(255,255,255,0.07);
+  --border: rgba(255, 255, 255, 0.07);
   --muted: #94a3b8;
 }
 
 /* ============================================
    BASE
    ============================================ */
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -48,7 +53,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  font-feature-settings: "cv02","cv03","cv04","cv11";
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -61,31 +66,84 @@ body {
    ANIMATIONS
    ============================================ */
 @keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%       { transform: translateY(-20px) scale(1.05); }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes staggerIn {
-  from { opacity: 0; transform: translateY(32px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
-.animate-float       { animation: float 10s ease-in-out infinite; }
-.animate-fade-in     { animation: fadeIn 0.7s ease-out forwards; }
-.animate-stagger-in  { animation: staggerIn 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+.animate-float {
+  animation: float 10s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+.animate-stagger-in {
+  animation: staggerIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 /* Helper classes — start invisible, animation reveals */
-.fade-in    { opacity: 0; animation: fadeIn    0.7s ease-out forwards; }
-.stagger-in { opacity: 0; animation: staggerIn 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+.stagger-in {
+  opacity: 0;
+  animation: staggerIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 /* ============================================
    LAYOUT
@@ -94,7 +152,7 @@ body {
   background: rgba(2, 6, 23, 0.85);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border-right: 1px solid rgba(255,255,255,0.07);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 /* ============================================
@@ -105,10 +163,10 @@ body {
   border: 1px solid var(--border);
   border-radius: 2rem;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
 }
@@ -117,19 +175,21 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(99,102,241,0.04));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(99, 102, 241, 0.04));
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
 }
 
 .card-premium:hover {
-  border-color: rgba(59,130,246,0.2);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.1);
   transform: translateY(-2px);
 }
 
-.card-premium:hover::before { opacity: 1; }
+.card-premium:hover::before {
+  opacity: 1;
+}
 
 /* ============================================
    BUTTONS
@@ -148,8 +208,8 @@ body {
   font-size: 0.875rem;
   letter-spacing: -0.01em;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-  box-shadow: 0 8px 32px rgba(59,130,246,0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.35);
   cursor: pointer;
   border: none;
   outline: none;
@@ -165,15 +225,23 @@ body {
   z-index: 0;
 }
 
-.btn-premium > * { position: relative; z-index: 1; }
+.btn-premium>* {
+  position: relative;
+  z-index: 1;
+}
 
 .btn-premium:hover {
   transform: scale(1.02) translateY(-1px);
-  box-shadow: 0 12px 40px rgba(59,130,246,0.5);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5);
 }
 
-.btn-premium:hover::after { opacity: 1; }
-.btn-premium:active { transform: scale(0.98); }
+.btn-premium:hover::after {
+  opacity: 1;
+}
+
+.btn-premium:active {
+  transform: scale(0.98);
+}
 
 /* ============================================
    NAVIGATION
@@ -194,11 +262,11 @@ body {
 
 .nav-link-premium:hover {
   color: #f1f5f9;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .nav-link-active-premium {
-  background: rgba(255,255,255,0.07);
+  background: rgba(255, 255, 255, 0.07);
   color: #f1f5f9;
   font-weight: 700;
 }
@@ -213,7 +281,7 @@ body {
   height: 1.5rem;
   background: #3b82f6;
   border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 12px rgba(59,130,246,0.6);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
 }
 
 /* ============================================
@@ -221,8 +289,8 @@ body {
    ============================================ */
 .input-forge {
   width: 100%;
-  background: rgba(15,23,42,0.8);
-  border: 2px solid rgba(255,255,255,0.07);
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.07);
   border-radius: 1rem;
   padding: 1rem 1.25rem;
   color: #f1f5f9;
@@ -233,29 +301,35 @@ body {
 }
 
 .input-forge:focus {
-  border-color: rgba(59,130,246,0.4);
-  box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
-  background: rgba(15,23,42,1);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+  background: rgba(15, 23, 42, 1);
 }
 
-.input-forge::placeholder { color: rgba(148,163,184,0.4); }
+.input-forge::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
 
 /* ============================================
    SKELETON LOADING
    ============================================ */
 .skeleton {
   background: linear-gradient(90deg,
-    rgba(255,255,255,0.04) 25%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.04) 75%
-  );
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.04) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ============================================
@@ -263,7 +337,7 @@ body {
    ============================================ */
 .text-glow {
   text-shadow: 0 0 24px rgba(59, 130, 246, 0.5),
-               0 0 48px rgba(59, 130, 246, 0.2);
+    0 0 48px rgba(59, 130, 246, 0.2);
 }
 
 .font-display {
@@ -273,7 +347,69 @@ body {
 /* ============================================
    SCROLLBAR
    ============================================ */
-::-webkit-scrollbar            { width: 4px; height: 4px; }
-::-webkit-scrollbar-track      { background: transparent; }
-::-webkit-scrollbar-thumb      { background: rgba(255,255,255,0.1); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover{ background: rgba(59,130,246,0.4); }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.4);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-6 {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.4);
+}

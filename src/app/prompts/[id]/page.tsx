@@ -27,11 +27,11 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
           fetch(`/api/prompts/${id}`),
           fetch(`/api/test-suites`)
         ]);
-        
+
         if (!pRes.ok) throw new Error('Not found');
         const pData = await pRes.json();
         const sData = await sRes.json();
-        
+
         setPrompt(pData);
         setTestSuites(sData);
         if (sData.length > 0) setSelectedSuite(sData[0].suite_id);
@@ -72,9 +72,9 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt_id: id, 
-          version_id: prompt?.current_version, 
+        body: JSON.stringify({
+          prompt_id: id,
+          version_id: prompt?.current_version,
           suite_id: selectedSuite,
           model: selectedModel
         }),
@@ -118,6 +118,35 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
     } catch (err) {
       console.error(err);
       alert('Delete failed');
+    }
+  };
+
+  const handleSaveAsTemplate = async () => {
+    if (!prompt) return;
+    const currentVersion = prompt.versions.find(v => v.version_id === prompt.current_version);
+    if (!currentVersion) return;
+
+    const category = prompt.title.includes('Summary') ? 'Summarization' :
+      prompt.title.includes('Analysis') ? 'Analysis' :
+        prompt.title.includes('Rewrite') ? 'Rewriting' : 'General';
+
+    try {
+      const res = await fetch('/api/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category,
+          title: `${prompt.title} Template`,
+          text: currentVersion.prompt_text
+        }),
+      });
+
+      if (res.ok) {
+        alert('Template saved successfully!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save template');
     }
   };
 
@@ -170,15 +199,21 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
             {prompt.description}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-5">
-          <button 
+          <button
+            onClick={handleSaveAsTemplate}
+            className="px-6 py-4 rounded-2xl font-bold bg-neon-500/10 text-neon-500 border border-neon-500/20 hover:bg-neon-500 hover:text-white transition-all duration-300"
+          >
+            Save as Template
+          </button>
+          <button
             onClick={handleDelete}
             className="px-6 py-4 rounded-2xl font-bold bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all duration-300"
           >
             Terminal Shutdown
           </button>
-          <button 
+          <button
             onClick={handleCreateVersion}
             disabled={saving}
             className="btn-premium"
@@ -203,16 +238,16 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
                 <span className="text-[10px] font-black text-neural-400 uppercase tracking-[0.2em]">Neural Buffer v2.4</span>
               </div>
               <div className="flex items-center space-x-3">
-                 <div className="w-2 h-2 rounded-full bg-electric-500 animate-pulse" />
-                 <span className="text-[10px] font-black text-electric-500 uppercase tracking-widest">Active Link</span>
+                <div className="w-2 h-2 rounded-full bg-electric-500 animate-pulse" />
+                <span className="text-[10px] font-black text-electric-500 uppercase tracking-widest">Active Link</span>
               </div>
             </div>
-            
+
             <div className="flex-1 relative">
               <div className="absolute left-0 top-0 bottom-0 w-16 bg-neural-50/50 dark:bg-neural-950/20 border-r border-border dark:border-white/5 flex flex-col items-center py-10 space-y-4 opacity-40">
-                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <span key={n} className="text-[10px] font-mono font-bold leading-relaxed">{n}</span>)}
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <span key={n} className="text-[10px] font-mono font-bold leading-relaxed">{n}</span>)}
               </div>
-              <textarea 
+              <textarea
                 value={currentText}
                 onChange={(e) => setCurrentText(e.target.value)}
                 className="w-full h-full pl-24 pr-12 py-10 font-mono text-lg lg:text-xl leading-relaxed bg-transparent focus:outline-none text-foreground resize-none selection:bg-electric-500/20 placeholder:text-neural-400/30"
@@ -232,8 +267,8 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
             <div className="space-y-8">
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-neural-500 uppercase tracking-[0.3em] pl-1">Target Model</label>
-                <select 
-                  value={selectedModel} 
+                <select
+                  value={selectedModel}
                   onChange={e => setSelectedModel(e.target.value)}
                   className="w-full p-4 rounded-2xl bg-white dark:bg-neural-950 border border-border dark:border-white/5 text-sm font-bold focus:ring-4 focus:ring-electric-500/10 outline-none transition-all cursor-pointer hover:border-electric-500/30"
                 >
@@ -244,8 +279,8 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-neural-500 uppercase tracking-[0.3em] pl-1">Logic Source</label>
-                <select 
-                  value={selectedSuite} 
+                <select
+                  value={selectedSuite}
                   onChange={e => setSelectedSuite(e.target.value)}
                   className="w-full p-4 rounded-2xl bg-white dark:bg-neural-950 border border-border dark:border-white/5 text-sm font-bold focus:ring-4 focus:ring-electric-500/10 outline-none transition-all hover:border-electric-500/30 cursor-pointer"
                 >
@@ -255,8 +290,8 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
                   ))}
                 </select>
               </div>
-              
-              <button 
+
+              <button
                 onClick={handleRunTests}
                 disabled={running}
                 className="w-full btn-premium !py-5 mt-4"
@@ -280,13 +315,13 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
             <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em] mb-8 font-display">Artifact History</h3>
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {[...prompt.versions].reverse().map((version) => (
-                <div 
+                <div
                   key={version.version_id}
                   onClick={() => version.version_id === prompt.current_version ? null : handleRollback(version.version_id)}
                   className={`
                     p-6 rounded-2xl border-2 transition-all cursor-pointer group
-                    ${version.version_id === prompt.current_version 
-                      ? 'bg-electric-500/5 border-electric-500/20 cursor-default' 
+                    ${version.version_id === prompt.current_version
+                      ? 'bg-electric-500/5 border-electric-500/20 cursor-default'
                       : 'bg-neural-50 dark:bg-neural-950 border-transparent hover:border-neural-200 dark:hover:border-white/10'}
                   `}
                 >
