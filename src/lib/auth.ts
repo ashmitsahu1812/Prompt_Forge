@@ -26,20 +26,8 @@ const usersFile = join(process.cwd(), 'data', 'users.json');
 
 function ensureUsersFile() {
   if (!existsSync(usersFile)) {
-    const defaultAdmin: User = {
-      id: 'admin_001',
-      email: 'admin@promptforge.dev',
-      name: 'Admin User',
-      password: bcrypt.hashSync('admin123', 12),
-      role: 'admin',
-      created_at: new Date().toISOString(),
-      preferences: {
-        theme: 'dark',
-        notifications: true,
-        auto_save: true
-      }
-    };
-    writeFileSync(usersFile, JSON.stringify([defaultAdmin], null, 2));
+    // Start with empty users array - no demo account
+    writeFileSync(usersFile, JSON.stringify([], null, 2));
   }
 }
 
