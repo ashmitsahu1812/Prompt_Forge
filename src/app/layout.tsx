@@ -1,6 +1,7 @@
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import LayoutClient from "../components/LayoutClient";
+import AuthProvider from "../components/AuthProvider";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -30,9 +31,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="h-full overflow-hidden relative" suppressHydrationWarning>
-        <LayoutClient>
-          {children}
-        </LayoutClient>
+        <AuthProvider>
+          <LayoutClient>
+            {children}
+          </LayoutClient>
+        </AuthProvider>
       </body>
     </html>
   );

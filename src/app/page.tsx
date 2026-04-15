@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { useSession, signOut } from 'next-auth/react';
 import { Prompt } from "@/lib/data";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -50,6 +52,46 @@ export default function Home() {
 
   return (
     <div className="space-y-20 lg:space-y-32 fade-in">
+
+      {/* Authentication Banner */}
+      {status !== 'loading' && (
+        <div className="fixed top-4 right-4 z-50">
+          {session ? (
+            <div className="flex items-center space-x-4 px-6 py-3 bg-neural-900/90 backdrop-blur-md border border-green-500/20 rounded-2xl shadow-2xl">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
+                  {session.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-white">{session.user?.name}</div>
+                  <div className="text-xs text-green-400 capitalize">{session.user?.role || 'Member'}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl font-bold text-sm hover:bg-red-500/20 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/login"
+                className="px-6 py-3 bg-blue-500 text-white font-bold rounded-2xl shadow-2xl hover:bg-blue-600 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="px-6 py-3 bg-neural-900/90 backdrop-blur-md border border-white/10 text-white font-bold rounded-2xl shadow-2xl hover:border-blue-500/30 transition-colors"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* HERO SECTION */}
       <section className="relative py-16 lg:py-28 overflow-hidden">

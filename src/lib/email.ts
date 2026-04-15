@@ -63,6 +63,15 @@ export interface InvitationEmailData {
 
 export async function sendTeamInvitation(data: InvitationEmailData) {
   try {
+    console.log('🚀 Attempting to send email with config:', {
+      service: process.env.EMAIL_SERVICE,
+      from: process.env.EMAIL_FROM,
+      to: data.recipientEmail,
+      hasUser: !!process.env.EMAIL_USER,
+      hasPass: !!process.env.EMAIL_PASS,
+      hasSendGridKey: !!process.env.SENDGRID_API_KEY
+    });
+
     const transporter = createTransporter();
 
     const htmlContent = `
@@ -139,16 +148,28 @@ Prompt Forge Team
 
     const result = await transporter.sendMail(mailOptions);
 
-    console.log('✅ Invitation email sent:', result.messageId);
+    console.log('✅ Invitation email sent successfully:', {
+      messageId: result.messageId,
+      to: data.recipientEmail,
+      service: process.env.EMAIL_SERVICE
+    });
 
     // For development with Ethereal, log the preview URL
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📧 Preview URL:', nodemailer.getTestMessageUrl(result));
+    if (process.env.NODE_ENV === 'development' && !process.env.EMAIL_SERVICE) {
+      console.log('📧 Preview URL (Ethereal):', nodemailer.getTestMessageUrl(result));
+      console.log('⚠️  This is a test email - no real email was sent. Configure EMAIL_SERVICE to send real emails.');
     }
 
     return { success: true, messageId: result.messageId };
   } catch (error) {
     console.error('❌ Failed to send invitation email:', error);
+    console.error('📧 Email configuration check:', {
+      service: process.env.EMAIL_SERVICE,
+      hasUser: !!process.env.EMAIL_USER,
+      hasPass: !!process.env.EMAIL_PASS,
+      hasSendGridKey: !!process.env.SENDGRID_API_KEY,
+      from: process.env.EMAIL_FROM
+    });
     throw new Error('Failed to send invitation email');
   }
 }
