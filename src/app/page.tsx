@@ -28,16 +28,16 @@ export default function Home() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPromptData.title) return;
-    
+
     const res = await fetch("/api/prompts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        title: newPromptData.title, 
-        description: newPromptData.description || "Neural Blueprint Phase 1" 
+      body: JSON.stringify({
+        title: newPromptData.title,
+        description: newPromptData.description || "Neural Blueprint Phase 1"
       }),
     });
-    
+
     if (res.ok) {
       const data = await res.json();
       setPrompts([...prompts, data]);
@@ -50,31 +50,37 @@ export default function Home() {
 
   return (
     <div className="space-y-20 lg:space-y-32 fade-in">
-      
+
       {/* HERO SECTION */}
       <section className="relative py-16 lg:py-28 overflow-hidden">
         <div className="max-w-4xl space-y-10 stagger-in relative z-10">
           <div className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-electric-500/10 border border-electric-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-electric-500 shadow-glow">
-             <span className="relative flex h-2 w-2">
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-electric-400 opacity-75"></span>
-               <span className="relative inline-flex rounded-full h-2 w-2 bg-electric-500"></span>
-             </span>
-             <span>Neural Engine: Online</span>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-electric-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-electric-500"></span>
+            </span>
+            <span>Neural Engine: Online</span>
           </div>
           <h1 className="text-6xl lg:text-8xl font-black text-foreground tracking-tighter leading-[0.9] font-display">
-            The Digital <span className="text-electric-500 text-glow">Loom</span> <br/>
+            The Digital <span className="text-electric-500 text-glow">Loom</span> <br />
             for AI Logic
           </h1>
           <p className="text-xl lg:text-2xl text-neural-400 leading-relaxed font-medium max-w-2xl">
             Architect, audit, and orchestrate high-fidelity prompt structures. Professional-grade tools for the next generation of AI engineers.
           </p>
           <div className="flex flex-wrap gap-6 pt-6">
-            <button 
+            <button
               onClick={() => setIsModalOpen(true)}
               className="btn-premium"
             >
               <span>Initialize Blueprint</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+            </button>
+            <button
+              onClick={() => window.open('/api/export?format=json&include=prompts,test_suites,templates,results', '_blank')}
+              className="px-8 py-4 rounded-2xl font-bold bg-neural-100 dark:bg-neural-900 border border-border dark:border-white/5 hover:border-electric-500/30 transition-all"
+            >
+              Export Data
             </button>
             <button className="px-8 py-4 rounded-2xl font-bold bg-neural-100 dark:bg-neural-900 border border-border dark:border-white/5 hover:border-electric-500/30 transition-all">
               Documentation
@@ -116,7 +122,7 @@ export default function Home() {
             <div className="text-[10px] font-black text-neural-400 uppercase tracking-widest mt-1">Found Instances</div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
           {loading ? (
             [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-72 card-premium skeleton" />)
@@ -167,8 +173,8 @@ export default function Home() {
                   </Link>
                 ))
               )}
-              
-              <button 
+
+              <button
                 onClick={() => setIsModalOpen(true)}
                 className="group card-premium border-dashed border-2 flex flex-col items-center justify-center space-y-6 hover:bg-neural-50/50 dark:hover:bg-neural-900/50 hover:border-electric-500/40 min-h-[320px] transition-all duration-500"
               >
@@ -176,8 +182,8 @@ export default function Home() {
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                 </div>
                 <div className="text-center space-y-1">
-                   <div className="text-sm font-black text-foreground uppercase tracking-[0.2em]">New Thread</div>
-                   <div className="text-[10px] font-bold text-neural-400 uppercase tracking-widest opacity-60">Initialize Architecture</div>
+                  <div className="text-sm font-black text-foreground uppercase tracking-[0.2em]">New Thread</div>
+                  <div className="text-[10px] font-bold text-neural-400 uppercase tracking-widest opacity-60">Initialize Architecture</div>
                 </div>
               </button>
             </>
@@ -201,20 +207,20 @@ export default function Home() {
             <form onSubmit={handleCreate} className="space-y-10">
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-neural-400 uppercase tracking-[0.3em] pl-1">Architecture Title</label>
-                <input 
+                <input
                   autoFocus
-                  type="text" 
+                  type="text"
                   value={newPromptData.title}
-                  onChange={e => setNewPromptData({...newPromptData, title: e.target.value})}
+                  onChange={e => setNewPromptData({ ...newPromptData, title: e.target.value })}
                   className="input-forge !py-5 !px-6 !text-lg"
                   placeholder="e.g. Technical Nexus v1.0"
                 />
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-neural-400 uppercase tracking-[0.3em] pl-1">Objective Summary</label>
-                <textarea 
+                <textarea
                   value={newPromptData.description}
-                  onChange={e => setNewPromptData({...newPromptData, description: e.target.value})}
+                  onChange={e => setNewPromptData({ ...newPromptData, description: e.target.value })}
                   className="input-forge !h-40 !py-5 !px-6 !text-lg resize-none"
                   placeholder="Define the primary logic of this blueprint..."
                 />

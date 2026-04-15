@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { executePlugin, getAllPlugins } from '@/lib/plugins';
 
 const HF_TOKEN = process.env.HF_TOKEN;
 
@@ -8,11 +9,28 @@ export async function POST(req: NextRequest) {
       output,
       rubric = "Accuracy, clarity, and adherence to instructions.",
       model = "meta-llama/Llama-3.2-1B-Instruct",
-      scoringMethod = "ai", // "ai", "manual", "keyword", "length"
+      scoringMethod = "ai", // "ai", "manual", "keyword", "length", or plugin ID
       keywords = [],
       lengthThreshold = { min: 0, max: 1000 },
       manualScore = null
     } = await req.json();
+
+    // Check if it's a plugin-based scoring method
+    const plugins = getAllPlugins();
+    const plugin = plugins.find(p => p.id === scoringMethod && p.type === 'scorer' && p.enabled);
+
+    if (plugin) {
+      try {
+        const result = await executePlugin(scoringMethod, output, { rubric, keywords, lengthThreshold });
+        return NextResponse.json({
+          ...result,
+          method: `plugin:${scoringMethod}`
+        });
+      } catch (error) {
+        console.error('Plugin execution error:', error);
+        return NextResponse.json({ error: 'Plugin execution failed' }, { status: 500 });
+      }
+    }
 
     // Handle different scoring methods
     switch (scoringMethod) {

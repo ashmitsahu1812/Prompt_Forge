@@ -9,10 +9,11 @@ export default function ResultsDetail({ params }: { params: Promise<{ id: string
   const [log, setLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [scoringMethod, setScoringMethod] = useState<'ai' | 'manual' | 'keyword' | 'length'>('ai');
+  const [scoringMethod, setScoringMethod] = useState<'ai' | 'manual' | 'keyword' | 'length' | string>('ai');
   const [keywords, setKeywords] = useState<string>('');
   const [lengthThreshold, setLengthThreshold] = useState({ min: 50, max: 500 });
   const [showScoringModal, setShowScoringModal] = useState<number | null>(null);
+  const [availablePlugins, setAvailablePlugins] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,6 +21,12 @@ export default function ResultsDetail({ params }: { params: Promise<{ id: string
     fetch(`/api/results/${id}`).then(res => res.json()).then(data => {
       setLog(data);
       setLoading(false);
+    });
+
+    // Fetch available scoring plugins
+    fetch('/api/plugins').then(res => res.json()).then(data => {
+      const scoringPlugins = (data.data || []).filter((p: any) => p.type === 'scorer' && p.enabled);
+      setAvailablePlugins(scoringPlugins);
     });
   }, [id]);
 
