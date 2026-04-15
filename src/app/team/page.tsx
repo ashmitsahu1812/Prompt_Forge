@@ -11,6 +11,9 @@ interface User {
   avatar?: string;
   created_at: string;
   last_active: string;
+  status?: 'active' | 'pending' | 'inactive';
+  invite_token?: string;
+  invite_expires?: string;
 }
 
 interface Activity {
@@ -66,14 +69,25 @@ export default function Team() {
         body: JSON.stringify(newUser),
       });
 
+      const userData = await res.json();
+
       if (res.ok) {
-        const userData = await res.json();
         setUsers([...users, userData.data]);
         setShowInviteModal(false);
         setNewUser({ name: '', email: '', role: 'editor' });
+
+        // Show success message
+        if (userData.warning) {
+          alert(`⚠️ ${userData.message}`);
+        } else {
+          alert(`✅ ${userData.message}`);
+        }
+      } else {
+        alert(`❌ ${userData.error}`);
       }
     } catch (error) {
       console.error('Failed to invite user:', error);
+      alert('❌ Failed to send invitation. Please try again.');
     }
   };
 
@@ -198,9 +212,12 @@ export default function Team() {
                   </select>
 
                   <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${new Date(user.last_active) > new Date(Date.now() - 5 * 60 * 1000) ? 'bg-green-500' : 'bg-neural-400'}`} />
+                    <div className={`w-3 h-3 rounded-full ${user.status === 'pending' ? 'bg-yellow-500' :
+                      new Date(user.last_active) > new Date(Date.now() - 5 * 60 * 1000) ? 'bg-green-500' : 'bg-neural-400'
+                      }`} />
                     <span className="text-[10px] text-neural-400 uppercase tracking-widest">
-                      {new Date(user.last_active) > new Date(Date.now() - 5 * 60 * 1000) ? 'Online' : 'Offline'}
+                      {user.status === 'pending' ? 'Pending Invitation' :
+                        new Date(user.last_active) > new Date(Date.now() - 5 * 60 * 1000) ? 'Online' : 'Offline'}
                     </span>
                   </div>
                 </div>

@@ -12,6 +12,9 @@ export type User = {
   avatar?: string;
   created_at: string;
   last_active: string;
+  status?: 'active' | 'pending' | 'inactive';
+  invite_token?: string;
+  invite_expires?: string;
 };
 
 export type Team = {
@@ -192,4 +195,28 @@ export function hasPermission(user: User, action: string, resource?: any): boole
   }
 
   return false;
+}
+export function generateInviteToken(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+export function isInviteTokenValid(user: User): boolean {
+  if (!user.invite_token || !user.invite_expires) return false;
+  return new Date(user.invite_expires) > new Date();
+}
+
+export function getUserByInviteToken(token: string): User | null {
+  const users = getAllUsers();
+  return users.find(u => u.invite_token === token && isInviteTokenValid(u)) || null;
+}
+
+export function activateUser(userId: string) {
+  const user = getUser(userId);
+  if (user) {
+    user.status = 'active';
+    user.invite_token = undefined;
+    user.invite_expires = undefined;
+    user.last_active = new Date().toISOString();
+    saveUser(user);
+  }
 }

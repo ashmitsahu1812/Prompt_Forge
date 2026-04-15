@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllUsers, saveUser, User, logActivity } from '@/lib/team';
+import { getAllUsers, saveUser, User, logActivity, generateInviteToken } from '@/lib/team';
+import { sendTeamInvitation } from '@/lib/email';
 
 export async function GET() {
   try {
@@ -37,32 +38,70 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Generate invitation token
+    const inviteToken = generateInviteToken();
+    const inviteExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
+
     const newUser: User = {
       user_id: `user_${Date.now()}`,
       name,
       email,
       role,
+      status: 'pending',
+      invite_token: inviteToken,
+      invite_expires: inviteExpires,
       created_at: new Date().toISOString(),
       last_active: new Date().toISOString()
     };
 
     saveUser(newUser);
 
-    // Log activity
-    logActivity({
-      user_id: 'system',
-      action: 'created',
-      resource_type: 'execution',
-      resource_id: newUser.user_id,
-      details: `Invited ${name} (${email}) as ${role}`
-    });
+    // Send invitation email
+    try {
+      const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/invite/${inviteToken}`;
 
-    return NextResponse.json({
-      data: newUser,
-      meta: {
-        timestamp: new Date().toISOString()
-      }
-    }, { status: 201 });
+      await sendTeamInvitation({
+        recipientEmail: email,
+        recipientName: name,
+        inviterName: 'Prompt Forge Team', // You can get this from session/auth
+        teamName: 'Prompt Forge Team',
+        role,
+        inviteToken,
+        inviteUrl
+      });
+
+      // Log activity
+      logActivity({
+        user_id: 'system',
+        action: 'created',
+        resource_type: 'execution',
+        resource_id: newUser.user_id,
+        details: `Sent invitation to ${name} (${email}) as ${role}`
+      });
+
+      return NextResponse.json({
+        data: newUser,
+        message: 'Invitation sent successfully! Check your email.',
+        meta: {
+          timestamp: new Date().toISOString(),
+          invite_expires: inviteExpires
+        }
+      }, { status: 201 });
+
+    } catch (emailError) {
+      console.error('Failed to send invitation email:', emailError);
+
+      // Still return success but indicate email issue
+      return NextResponse.json({
+        data: newUser,
+        message: 'User created but failed to send invitation email. Please check email configuration.',
+        warning: 'Email delivery failed',
+        meta: {
+          timestamp: new Date().toISOString(),
+          invite_expires: inviteExpires
+        }
+      }, { status: 201 });
+    }
   } catch (error) {
     console.error('Error creating user:', error);
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
