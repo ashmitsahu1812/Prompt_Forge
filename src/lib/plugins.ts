@@ -1,6 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import { DATA_DIR } from './data';
+// In-memory plugin management for Vercel compatibility
 
 export interface Plugin {
   id: string;
@@ -30,23 +28,13 @@ export interface IntegrationPlugin extends Plugin {
   }[];
 }
 
-export function getPluginsPath() {
-  return path.join(DATA_DIR, 'plugins');
-}
+// In-memory storage
+let plugins: Plugin[] = [];
 
-export function getPluginConfigPath() {
-  return path.join(getPluginsPath(), 'config.json');
-}
-
-export function initializePlugins() {
-  const pluginsDir = getPluginsPath();
-  if (!fs.existsSync(pluginsDir)) {
-    fs.mkdirSync(pluginsDir, { recursive: true });
-  }
-
-  const configPath = getPluginConfigPath();
-  if (!fs.existsSync(configPath)) {
-    const defaultPlugins: Plugin[] = [
+// Initialize with default plugins
+function initializePlugins() {
+  if (plugins.length === 0) {
+    plugins = [
       {
         id: 'readability-scorer',
         name: 'Readability Scorer',
@@ -79,6 +67,38 @@ export function initializePlugins() {
         updated_at: new Date().toISOString()
       },
       {
+        id: 'length-scorer',
+        name: 'Length Scorer',
+        version: '1.0.0',
+        description: 'Scores based on response length criteria',
+        author: 'Prompt Forge Team',
+        type: 'scorer',
+        enabled: true,
+        config: {
+          min_length: 50,
+          max_length: 500,
+          optimal_length: 200
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'keyword-scorer',
+        name: 'Keyword Scorer',
+        version: '1.0.0',
+        description: 'Scores based on keyword presence and density',
+        author: 'Prompt Forge Team',
+        type: 'scorer',
+        enabled: true,
+        config: {
+          required_keywords: [],
+          bonus_keywords: [],
+          penalty_keywords: []
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
         id: 'slack-integration',
         name: 'Slack Integration',
         version: '1.0.0',
@@ -95,24 +115,21 @@ export function initializePlugins() {
         updated_at: new Date().toISOString()
       }
     ];
-    fs.writeFileSync(configPath, JSON.stringify(defaultPlugins, null, 2));
   }
 }
 
 export function getAllPlugins(): Plugin[] {
   initializePlugins();
-  const configPath = getPluginConfigPath();
-  const content = fs.readFileSync(configPath, 'utf8');
-  return JSON.parse(content);
+  return plugins;
 }
 
 export function getPlugin(pluginId: string): Plugin | null {
-  const plugins = getAllPlugins();
+  initializePlugins();
   return plugins.find(p => p.id === pluginId) || null;
 }
 
 export function savePlugin(plugin: Plugin) {
-  const plugins = getAllPlugins();
+  initializePlugins();
   const existingIndex = plugins.findIndex(p => p.id === plugin.id);
 
   plugin.updated_at = new Date().toISOString();
@@ -122,17 +139,11 @@ export function savePlugin(plugin: Plugin) {
   } else {
     plugins.push(plugin);
   }
-
-  const configPath = getPluginConfigPath();
-  fs.writeFileSync(configPath, JSON.stringify(plugins, null, 2));
 }
 
 export function deletePlugin(pluginId: string) {
-  const plugins = getAllPlugins();
-  const filteredPlugins = plugins.filter(p => p.id !== pluginId);
-
-  const configPath = getPluginConfigPath();
-  fs.writeFileSync(configPath, JSON.stringify(filteredPlugins, null, 2));
+  initializePlugins();
+  plugins = plugins.filter(p => p.id !== pluginId);
 }
 
 export function togglePlugin(pluginId: string, enabled: boolean) {
@@ -147,14 +158,14 @@ export function togglePlugin(pluginId: string, enabled: boolean) {
 export const builtInScorers = {
   'readability-scorer': async (output: string, criteria: any) => {
     const words = output.split(/\s+/).length;
-    const sentences = output.split(/[.!?]+/).length;
-    const avgWordsPerSentence = words / sentences;
+    const sentences = output.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+    const avgWordsPerSentence = sentences > 0 ? words / sentences : words;
 
     // Simple readability score (lower is better, convert to 1-10 scale)
     let readabilityScore = Math.max(1, Math.min(10, 15 - avgWordsPerSentence));
 
     return {
-      score: Math.round(readabilityScore),
+      score: Math.round(readabilityScore * 10) / 10,
       justification: `Readability analysis: ${words} words, ${sentences} sentences, ${avgWordsPerSentence.toFixed(1)} words per sentence`
     };
   },
@@ -172,8 +183,87 @@ export const builtInScorers = {
     const normalizedScore = Math.max(1, Math.min(10, 5 + sentimentScore));
 
     return {
-      score: Math.round(normalizedScore),
+      score: Math.round(normalizedScore * 10) / 10,
       justification: `Sentiment analysis: ${positiveCount} positive terms, ${negativeCount} negative terms`
+    };
+  },
+
+  'length-scorer': async (output: string, criteria: any) => {
+    const config = criteria.config || {};
+    const minLength = config.min_length || 50;
+    const maxLength = config.max_length || 500;
+    const optimalLength = config.optimal_length || 200;
+
+    const length = output.length;
+    let score = 10;
+
+    if (length < minLength) {
+      score = Math.max(1, (length / minLength) * 5);
+    } else if (length > maxLength) {
+      score = Math.max(1, 10 - ((length - maxLength) / maxLength) * 5);
+    } else {
+      // Score based on distance from optimal length
+      const distance = Math.abs(length - optimalLength);
+      const maxDistance = Math.max(optimalLength - minLength, maxLength - optimalLength);
+      score = Math.max(5, 10 - (distance / maxDistance) * 5);
+    }
+
+    return {
+      score: Math.round(score * 10) / 10,
+      justification: `Length analysis: ${length} characters (optimal: ${optimalLength}, range: ${minLength}-${maxLength})`
+    };
+  },
+
+  'keyword-scorer': async (output: string, criteria: any) => {
+    const config = criteria.config || {};
+    const requiredKeywords = config.required_keywords || [];
+    const bonusKeywords = config.bonus_keywords || [];
+    const penaltyKeywords = config.penalty_keywords || [];
+
+    const outputLower = output.toLowerCase();
+
+    let score = 5; // Base score
+    let justification = [];
+
+    // Check required keywords
+    const foundRequired = requiredKeywords.filter((keyword: string) =>
+      outputLower.includes(keyword.toLowerCase())
+    );
+    const requiredScore = requiredKeywords.length > 0 ?
+      (foundRequired.length / requiredKeywords.length) * 5 : 0;
+    score += requiredScore;
+
+    if (requiredKeywords.length > 0) {
+      justification.push(`Required keywords: ${foundRequired.length}/${requiredKeywords.length}`);
+    }
+
+    // Check bonus keywords
+    const foundBonus = bonusKeywords.filter((keyword: string) =>
+      outputLower.includes(keyword.toLowerCase())
+    );
+    const bonusScore = Math.min(2, foundBonus.length * 0.5);
+    score += bonusScore;
+
+    if (bonusKeywords.length > 0) {
+      justification.push(`Bonus keywords: ${foundBonus.length}`);
+    }
+
+    // Check penalty keywords
+    const foundPenalty = penaltyKeywords.filter((keyword: string) =>
+      outputLower.includes(keyword.toLowerCase())
+    );
+    const penaltyScore = foundPenalty.length * 1;
+    score -= penaltyScore;
+
+    if (foundPenalty.length > 0) {
+      justification.push(`Penalty keywords: ${foundPenalty.length}`);
+    }
+
+    score = Math.max(1, Math.min(10, score));
+
+    return {
+      score: Math.round(score * 10) / 10,
+      justification: `Keyword analysis: ${justification.join(', ')}`
     };
   }
 };
