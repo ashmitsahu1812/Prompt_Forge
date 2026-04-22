@@ -1,4 +1,6 @@
-// In-memory plugin management for Vercel compatibility
+import fs from 'fs';
+import path from 'path';
+import { DATA_DIR } from './data';
 
 export interface Plugin {
   id: string;
@@ -28,13 +30,20 @@ export interface IntegrationPlugin extends Plugin {
   }[];
 }
 
-// In-memory storage
-let plugins: Plugin[] = [];
+function getPluginsFilePath() {
+  return path.join(DATA_DIR, 'plugins', 'plugins.json');
+}
 
 // Initialize with default plugins
 function initializePlugins() {
-  if (plugins.length === 0) {
-    plugins = [
+  const pluginsDir = path.join(DATA_DIR, 'plugins');
+  if (!fs.existsSync(pluginsDir)) {
+    fs.mkdirSync(pluginsDir, { recursive: true });
+  }
+
+  const filePath = getPluginsFilePath();
+  if (!fs.existsSync(filePath)) {
+    const defaultPlugins: Plugin[] = [
       {
         id: 'readability-scorer',
         name: 'Readability Scorer',
@@ -115,21 +124,24 @@ function initializePlugins() {
         updated_at: new Date().toISOString()
       }
     ];
+    fs.writeFileSync(filePath, JSON.stringify(defaultPlugins, null, 2), 'utf8');
   }
 }
 
 export function getAllPlugins(): Plugin[] {
   initializePlugins();
-  return plugins;
+  const filePath = getPluginsFilePath();
+  const content = fs.readFileSync(filePath, 'utf8');
+  return JSON.parse(content);
 }
 
 export function getPlugin(pluginId: string): Plugin | null {
-  initializePlugins();
+  const plugins = getAllPlugins();
   return plugins.find(p => p.id === pluginId) || null;
 }
 
 export function savePlugin(plugin: Plugin) {
-  initializePlugins();
+  const plugins = getAllPlugins();
   const existingIndex = plugins.findIndex(p => p.id === plugin.id);
 
   plugin.updated_at = new Date().toISOString();
@@ -139,11 +151,17 @@ export function savePlugin(plugin: Plugin) {
   } else {
     plugins.push(plugin);
   }
+
+  const filePath = getPluginsFilePath();
+  fs.writeFileSync(filePath, JSON.stringify(plugins, null, 2), 'utf8');
 }
 
 export function deletePlugin(pluginId: string) {
-  initializePlugins();
-  plugins = plugins.filter(p => p.id !== pluginId);
+  const plugins = getAllPlugins();
+  const newPlugins = plugins.filter(p => p.id !== pluginId);
+  
+  const filePath = getPluginsFilePath();
+  fs.writeFileSync(filePath, JSON.stringify(newPlugins, null, 2), 'utf8');
 }
 
 export function togglePlugin(pluginId: string, enabled: boolean) {

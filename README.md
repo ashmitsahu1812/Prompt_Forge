@@ -10,6 +10,7 @@
 *   **Test Suites:** Design multiple test cases and dynamic specific variables to validate the robustness of your prompts under different scenarios.
 *   **Execution & Evaluation:** Run prompts directly through the platform and carefully analyze generated results and execution logs.
 *   **Comparison Engine:** A side-by-side comparison view to track performance, accuracy, token usage, and overall output quality between different prompt iterations.
+*   **Plugin Ecosystem:** Expand platform capabilities explicitly by installing specialized custom scoring, UI extending, workflow running and integration plugins, managed from the UI.
 *   **Template Library:** Access and utilize a robust collection of pre-defined, high-quality prompt templates to accelerate development.
 *   **Minimalist UI:** A clean, modern, and high-fidelity user interface prioritizing stability and a professional user experience. 
 
@@ -31,7 +32,7 @@ The application follows a standard Next.js App Router structure:
 *   `src/app/compare`: The side-by-side prompt comparison engine.
 *   `src/app/results/[id]`: Interfaces for viewing execution history and detailed result cards.
 *   `src/components/...`: Reusable functional frontend UI elements (e.g., `Sidebar`, `RippleEffect`, `LayoutClient`).
-*   `data/`: Local JSON-based storage engine handling the persistence of prompts, templates, test suites, and execution logs.
+*   `data/`: Permanent local JSON-based file storage engine handling the persistence of prompts, templates, test suites, execution logs, and plugins.
 
 ## 💻 Getting Started
 

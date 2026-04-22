@@ -21,6 +21,9 @@ export default function Plugins() {
   const [mounted, setMounted] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [installJson, setInstallJson] = useState('');
+  const [installError, setInstallError] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -52,6 +55,34 @@ export default function Plugins() {
       }
     } catch (error) {
       console.error('Failed to toggle plugin:', error);
+    }
+  };
+
+  const handleInstallPlugin = async () => {
+    setInstallError('');
+    try {
+      const parsed = JSON.parse(installJson);
+      if (!parsed.name || !parsed.type) {
+        setInstallError('Plugin must have a name and type');
+        return;
+      }
+      
+      const res = await fetch('/api/plugins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed),
+      });
+
+      if (res.ok) {
+        setShowInstallModal(false);
+        setInstallJson('');
+        fetchPlugins();
+      } else {
+        const errorData = await res.json();
+        setInstallError(errorData.error || 'Failed to install plugin');
+      }
+    } catch (err) {
+      setInstallError('Invalid JSON format');
     }
   };
 
@@ -108,7 +139,7 @@ export default function Plugins() {
           </p>
         </div>
 
-        <button className="btn-premium !bg-emerald-500 hover:!bg-emerald-600">
+        <button onClick={() => setShowInstallModal(true)} className="btn-premium !bg-emerald-500 hover:!bg-emerald-600">
           <span>Install Plugin</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
         </button>
@@ -262,6 +293,45 @@ export default function Plugins() {
                     }`}
                 >
                   {selectedPlugin.enabled ? 'Disable Plugin' : 'Enable Plugin'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Install Modal */}
+      {showInstallModal && (
+        <div className="fixed inset-0 bg-neural-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-[fadeIn_0.3s_ease-out_forwards]" onClick={() => setShowInstallModal(false)}>
+          <div className="card-premium w-full max-w-2xl shadow-2xl animate-[zoomIn_0.3s_ease-out_forwards] max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-12">
+              <div className="space-y-1">
+                <h2 className="text-3xl font-black text-foreground uppercase tracking-tight font-display">Install Plugin</h2>
+                <p className="text-[10px] font-bold text-neural-400 uppercase tracking-[0.3em]">Provide Plugin JSON</p>
+              </div>
+              <button onClick={() => setShowInstallModal(false)} className="p-2 text-neural-400 hover:text-foreground transition-colors hover:bg-neural-100 dark:hover:bg-white/5 rounded-xl">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div className="flex flex-col space-y-4">
+                <label className="text-sm font-bold text-foreground">Plugin JSON Configuration</label>
+                <textarea
+                  value={installJson}
+                  onChange={(e) => setInstallJson(e.target.value)}
+                  className="w-full h-64 p-4 font-mono text-sm bg-neural-100 dark:bg-neural-900 border border-border dark:border-white/5 rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  placeholder={`{\n  "name": "My Custom Scorer",\n  "type": "scorer",\n  "description": "...",\n  "enabled": true\n}`}
+                />
+                {installError && <div className="text-red-500 text-sm font-medium">{installError}</div>}
+              </div>
+
+              <div className="flex space-x-4">
+                <button onClick={handleInstallPlugin} className="flex-1 btn-premium !bg-emerald-500 hover:!bg-emerald-600">
+                  <span>Install Plugin</span>
+                </button>
+                <button onClick={() => setShowInstallModal(false)} className="flex-1 px-6 py-4 rounded-2xl font-bold bg-neural-100 text-neural-600 dark:bg-white/5 dark:text-neural-400 hover:bg-neural-200 dark:hover:bg-white/10 transition-colors">
+                  Cancel
                 </button>
               </div>
             </div>
