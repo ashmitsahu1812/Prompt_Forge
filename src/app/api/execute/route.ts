@@ -39,11 +39,15 @@ export async function POST(req: NextRequest) {
           finalPrompt = finalPrompt.replaceAll(`{{${key}}}`, value as string);
         });
       } else {
-        // Fallback for string-based test cases: Try {{input}}, else replace any {{...}}
+        // Only replace {{input}} if it exists, otherwise treat as a system-defined prompt
         if (finalPrompt.includes('{{input}}')) {
           finalPrompt = finalPrompt.replaceAll('{{input}}', String(input));
+        } else if (finalPrompt.includes('{{')) {
+          // If there are other brackets, only replace the FIRST one if the user is using a legacy flat suite
+          finalPrompt = finalPrompt.replace(/\{\{[^}]+\}\}/, String(input));
         } else {
-          finalPrompt = finalPrompt.replace(/\{\{[^}]+\}\}/g, String(input));
+          // If no brackets, append the input to give the LLM context
+          finalPrompt = `${finalPrompt}\n\nClient Input: ${String(input)}`;
         }
       }
       
@@ -53,7 +57,9 @@ export async function POST(req: NextRequest) {
           method: "POST",
           body: JSON.stringify({ 
             messages: [{ role: "user", content: finalPrompt }],
-            model: "openai"
+            model: model.includes('mistral') ? 'mistral' : 
+                   model.includes('llama') ? 'llama' : 
+                   model.includes('gemma') ? 'gemma' : 'openai'
           }),
         });
 
@@ -63,11 +69,12 @@ export async function POST(req: NextRequest) {
         if (data.choices && data.choices[0] && data.choices[0].message) {
           outputText = data.choices[0].message.content;
         } else {
-          outputText = JSON.stringify(data);
+          outputText = "No clear response generated. Response data: " + JSON.stringify(data);
         }
 
         results.push({
           input,
+          final_prompt: finalPrompt,
           output: outputText,
           timestamp: new Date().toISOString()
         });

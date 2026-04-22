@@ -167,6 +167,14 @@ export default function ResultsDetail({ params }: { params: Promise<{ id: string
                       ) : (
                         <div className="italic opacity-80 dark:text-neural-300">"{res.input}"</div>
                       )}
+                      {res.final_prompt && (
+                        <div className="mt-4 pt-4 border-t border-border dark:border-white/5">
+                          <span className="text-[9px] uppercase tracking-widest text-neural-400 block mb-2 opacity-50">Sent Payload:</span>
+                          <div className="text-[10px] bg-black/20 p-3 rounded-lg border border-white/5 opacity-70 group-hover:opacity-100 transition-opacity">
+                            {res.final_prompt}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-10 py-12 align-top">
