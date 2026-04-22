@@ -61,9 +61,6 @@ export async function POST(req: NextRequest) {
       }
       
       try {
-        const response = await fetch(apiUrl, {
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
         // Mapping to recognized Pollinations.ai model names
         const targetModel = model.toLowerCase().includes('mistral') ? 'mistral' : 
                           model.toLowerCase().includes('llama') ? 'llama' : 
