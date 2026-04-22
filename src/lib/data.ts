@@ -2,14 +2,23 @@ import fs from 'fs';
 import path from 'path';
 
 const isServerless = process.env.VERCEL || process.env.NODE_ENV === 'production';
-export const DATA_DIR = isServerless ? '/tmp/data' : path.join(process.cwd(), 'data');
+export const DATA_DIR = isServerless 
+  ? '/tmp/data' 
+  : path.resolve(process.cwd(), 'data');
+
+console.log(`[Persistence] Active Data Directory: ${DATA_DIR}`);
 
 if (isServerless && !fs.existsSync('/tmp/data')) {
   try {
-    fs.mkdirSync('/tmp', { recursive: true });
-    fs.cpSync(path.join(process.cwd(), 'data'), '/tmp/data', { recursive: true });
+    if (!fs.existsSync('/tmp')) fs.mkdirSync('/tmp', { recursive: true });
+    // Seed initial data from the build time data directory if it exists
+    const sourceData = path.resolve(process.cwd(), 'data');
+    if (fs.existsSync(sourceData)) {
+      fs.cpSync(sourceData, '/tmp/data', { recursive: true });
+      console.log(`[Persistence] Seeded /tmp/data from ${sourceData}`);
+    }
   } catch(e) {
-    console.error("Error seeding Vercel /tmp/data", e);
+    console.error("[Persistence] Error seeding /tmp/data", e);
   }
 }
 

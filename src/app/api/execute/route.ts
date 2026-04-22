@@ -15,7 +15,16 @@ export async function POST(req: NextRequest) {
     } = await req.json();
 
     const prompt = getPrompt(prompt_id);
-    if (!prompt) return NextResponse.json({ error: 'Prompt not found' }, { status: 404 });
+    if (!prompt) {
+      const { getPromptDataPath } = await import('@/lib/data');
+      const path = getPromptDataPath(prompt_id);
+      console.error(`[API Execute] Prompt ID ${prompt_id} not found at ${path}`);
+      return NextResponse.json({ 
+        error: 'Prompt not found', 
+        id: prompt_id,
+        checked_path: path 
+      }, { status: 404 });
+    }
 
     const version = prompt.versions.find(v => v.version_id === version_id);
     if (!version) return NextResponse.json({ error: 'Version not found' }, { status: 404 });

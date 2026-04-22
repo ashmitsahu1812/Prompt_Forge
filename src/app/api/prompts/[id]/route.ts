@@ -9,7 +9,14 @@ export async function GET(
   const prompt = getPrompt(id);
   
   if (!prompt) {
-    return NextResponse.json({ error: 'Prompt not found' }, { status: 404 });
+    const { getPromptDataPath } = await import('@/lib/data');
+    const path = getPromptDataPath(id);
+    console.error(`[API] Prompt ID ${id} not found at ${path}`);
+    return NextResponse.json({ 
+      error: 'Prompt not found', 
+      id,
+      checked_path: path 
+    }, { status: 404 });
   }
   
   return NextResponse.json(prompt);
