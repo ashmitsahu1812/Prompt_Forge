@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
     const { 
       prompt_id, 
       version_id, 
+      prompt_text,
       suite_id, 
       model = "meta-llama/Llama-3.2-1B-Instruct" 
     } = await req.json();
@@ -27,9 +28,10 @@ export async function POST(req: NextRequest) {
     const startTime = Date.now();
 
     const apiUrl = `https://text.pollinations.ai/openai/v1/chat/completions`;
+    const textToExecute = prompt_text || version.prompt_text;
 
     for (const input of suite.inputs) {
-      let finalPrompt = version.prompt_text;
+      let finalPrompt = textToExecute;
       
       // Handle Multi-Variable Replacement
       if (typeof input === 'object' && input !== null) {
@@ -37,8 +39,12 @@ export async function POST(req: NextRequest) {
           finalPrompt = finalPrompt.replaceAll(`{{${key}}}`, value as string);
         });
       } else {
-        // Fallback for legacy string-based inputs
-        finalPrompt = finalPrompt.replaceAll('{{input}}', String(input));
+        // Fallback for string-based test cases: Try {{input}}, else replace any {{...}}
+        if (finalPrompt.includes('{{input}}')) {
+          finalPrompt = finalPrompt.replaceAll('{{input}}', String(input));
+        } else {
+          finalPrompt = finalPrompt.replace(/\{\{[^}]+\}\}/g, String(input));
+        }
       }
       
       try {

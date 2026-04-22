@@ -75,6 +75,7 @@ export default function PromptDetail({ params }: { params: Promise<{ id: string 
         body: JSON.stringify({
           prompt_id: id,
           version_id: prompt?.current_version,
+          prompt_text: currentText,
           suite_id: selectedSuite,
           model: selectedModel
         }),
