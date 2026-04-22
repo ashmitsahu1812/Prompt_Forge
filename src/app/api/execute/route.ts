@@ -64,15 +64,36 @@ export async function POST(req: NextRequest) {
         const response = await fetch(apiUrl, {
           headers: { "Content-Type": "application/json" },
           method: "POST",
+        // Mapping to recognized Pollinations.ai model names
+        const targetModel = model.toLowerCase().includes('mistral') ? 'mistral' : 
+                          model.toLowerCase().includes('llama') ? 'llama' : 
+                          model.toLowerCase().includes('gemma') ? 'gemma' : 'openai';
+
+        const response = await fetch(apiUrl, {
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
           body: JSON.stringify({ 
             messages: [{ role: "user", content: finalPrompt }],
-            model: model.includes('mistral') ? 'mistral' : 
-                   model.includes('llama') ? 'llama' : 
-                   model.includes('gemma') ? 'gemma' : 'openai'
+            model: targetModel,
+            seed: Math.floor(Math.random() * 1000000)
           }),
         });
 
-        const data = await response.json();
+        let data = await response.json();
+        
+        // Robust Fallback: If the specific model is not found, retry with 'openai'
+        if (data.error && data.error.includes('Model not found')) {
+          console.warn(`[Execution] Model ${targetModel} not found, falling back to 'openai'`);
+          const fallbackResponse = await fetch(apiUrl, {
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ 
+              messages: [{ role: "user", content: finalPrompt }],
+              model: 'openai'
+            }),
+          });
+          data = await fallbackResponse.json();
+        }
         
         let outputText = "";
         if (data.choices && data.choices[0] && data.choices[0].message) {
