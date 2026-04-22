@@ -19,13 +19,19 @@ export interface User {
   };
 }
 
-// In-memory storage for Vercel (temporary solution)
-// In production, you'd use a real database like PostgreSQL, MongoDB, etc.
-let users: User[] = [];
+import fs from 'fs';
+import path from 'path';
+import { DATA_DIR } from './data';
+
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 // Initialize with a default admin user for demo purposes
 function initializeUsers() {
-  if (users.length === 0) {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(USERS_FILE)) {
     const defaultAdmin: User = {
       id: 'admin_001',
       email: 'admin@promptforge.dev',
@@ -39,27 +45,32 @@ function initializeUsers() {
         auto_save: true
       }
     };
-    users.push(defaultAdmin);
+    fs.writeFileSync(USERS_FILE, JSON.stringify([defaultAdmin], null, 2), 'utf8');
   }
 }
 
 export function getAllUsers(): User[] {
   initializeUsers();
-  return users;
+  const content = fs.readFileSync(USERS_FILE, 'utf8');
+  return JSON.parse(content);
+}
+
+function saveUsers(users: User[]) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
 }
 
 export function getUserByEmail(email: string): User | null {
-  initializeUsers();
+  const users = getAllUsers();
   return users.find(user => user.email === email) || null;
 }
 
 export function getUserById(id: string): User | null {
-  initializeUsers();
+  const users = getAllUsers();
   return users.find(user => user.id === id) || null;
 }
 
 export function createUser(userData: Omit<User, 'id' | 'created_at'>): User {
-  initializeUsers();
+  const users = getAllUsers();
 
   // Check if user already exists
   if (users.some(u => u.email === userData.email)) {
@@ -74,16 +85,18 @@ export function createUser(userData: Omit<User, 'id' | 'created_at'>): User {
   };
 
   users.push(newUser);
+  saveUsers(users);
 
   return newUser;
 }
 
 export function updateUserLastLogin(userId: string) {
-  initializeUsers();
+  const users = getAllUsers();
   const userIndex = users.findIndex(u => u.id === userId);
 
   if (userIndex !== -1) {
     users[userIndex].last_login = new Date().toISOString();
+    saveUsers(users);
   }
 }
 

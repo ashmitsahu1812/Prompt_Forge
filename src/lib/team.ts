@@ -1,58 +1,20 @@
-// In-memory team management for Vercel compatibility
+import fs from 'fs';
+import path from 'path';
+import { DATA_DIR } from './data';
 
-export type UserRole = 'admin' | 'editor' | 'viewer';
-
-export type User = {
-  user_id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-  created_at: string;
-  last_active: string;
-  status?: 'active' | 'pending' | 'inactive';
-  invite_token?: string;
-  invite_expires?: string;
-};
-
-export type Team = {
-  team_id: string;
-  name: string;
-  description: string;
-  members: User[];
-  created_at: string;
-  settings: {
-    allow_public_prompts: boolean;
-    require_approval: boolean;
-    default_role: UserRole;
-  };
-};
-
-export type Activity = {
-  activity_id: string;
-  user_id: string;
-  action: 'created' | 'updated' | 'deleted' | 'executed' | 'shared';
-  resource_type: 'prompt' | 'test_suite' | 'template' | 'execution';
-  resource_id: string;
-  details: string;
-  timestamp: string;
-};
-
-// In-memory storage
-let teamUsers: User[] = [];
-let activities: Activity[] = [];
-let teamSettings = {
-  team_name: 'Prompt Forge Team',
-  allow_public_prompts: true,
-  require_approval: false,
-  default_role: 'editor' as UserRole,
-  created_at: new Date().toISOString()
-};
+const TEAM_DIR = path.join(DATA_DIR, 'team');
+const MEMBERS_FILE = path.join(TEAM_DIR, 'members.json');
+const ACTIVITIES_FILE = path.join(TEAM_DIR, 'activities.json');
+const SETTINGS_FILE = path.join(TEAM_DIR, 'settings.json');
 
 // Initialize with default data
 function initializeTeamData() {
-  if (teamUsers.length === 0) {
-    teamUsers = [
+  if (!fs.existsSync(TEAM_DIR)) {
+    fs.mkdirSync(TEAM_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(MEMBERS_FILE)) {
+    const defaultMembers: User[] = [
       {
         user_id: 'admin_001',
         name: 'Admin User',
@@ -63,36 +25,62 @@ function initializeTeamData() {
         status: 'active'
       }
     ];
+    fs.writeFileSync(MEMBERS_FILE, JSON.stringify(defaultMembers, null, 2), 'utf8');
+  }
+
+  if (!fs.existsSync(ACTIVITIES_FILE)) {
+    fs.writeFileSync(ACTIVITIES_FILE, JSON.stringify([], null, 2), 'utf8');
+  }
+
+  if (!fs.existsSync(SETTINGS_FILE)) {
+    const defaultSettings = {
+      team_name: 'Prompt Forge Team',
+      allow_public_prompts: true,
+      require_approval: false,
+      default_role: 'editor' as UserRole,
+      created_at: new Date().toISOString()
+    };
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(defaultSettings, null, 2), 'utf8');
   }
 }
 
 export function getAllUsers(): User[] {
   initializeTeamData();
-  return teamUsers;
+  const content = fs.readFileSync(MEMBERS_FILE, 'utf8');
+  return JSON.parse(content);
+}
+
+function saveMembers(members: User[]) {
+  fs.writeFileSync(MEMBERS_FILE, JSON.stringify(members, null, 2), 'utf8');
 }
 
 export function getUser(userId: string): User | null {
-  initializeTeamData();
-  return teamUsers.find(u => u.user_id === userId) || null;
+  const users = getAllUsers();
+  return users.find(u => u.user_id === userId) || null;
 }
 
 export function saveUser(user: User) {
-  initializeTeamData();
-  const existingIndex = teamUsers.findIndex(u => u.user_id === user.user_id);
+  const users = getAllUsers();
+  const existingIndex = users.findIndex(u => u.user_id === user.user_id);
 
   if (existingIndex >= 0) {
-    teamUsers[existingIndex] = user;
+    users[existingIndex] = user;
   } else {
-    teamUsers.push(user);
+    users.push(user);
   }
+  saveMembers(users);
 }
 
 export function deleteUser(userId: string) {
-  initializeTeamData();
-  teamUsers = teamUsers.filter(u => u.user_id !== userId);
+  const users = getAllUsers();
+  const newUsers = users.filter(u => u.user_id !== userId);
+  saveMembers(newUsers);
 }
 
 export function getAllActivities(limit: number = 50): Activity[] {
+  initializeTeamData();
+  const content = fs.readFileSync(ACTIVITIES_FILE, 'utf8');
+  const activities = JSON.parse(content);
   // Sort by timestamp (newest first) and limit
   return activities
     .sort((a: Activity, b: Activity) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
@@ -100,6 +88,10 @@ export function getAllActivities(limit: number = 50): Activity[] {
 }
 
 export function logActivity(activity: Omit<Activity, 'activity_id' | 'timestamp'>) {
+  initializeTeamData();
+  const content = fs.readFileSync(ACTIVITIES_FILE, 'utf8');
+  const activities: Activity[] = JSON.parse(content);
+  
   const newActivity: Activity = {
     ...activity,
     activity_id: Date.now().toString(),
@@ -109,17 +101,20 @@ export function logActivity(activity: Omit<Activity, 'activity_id' | 'timestamp'
   activities.unshift(newActivity);
 
   // Keep only last 1000 activities
-  if (activities.length > 1000) {
-    activities = activities.slice(0, 1000);
-  }
+  const limitedActivities = activities.slice(0, 1000);
+  fs.writeFileSync(ACTIVITIES_FILE, JSON.stringify(limitedActivities, null, 2), 'utf8');
 }
 
 export function getTeamSettings() {
-  return teamSettings;
+  initializeTeamData();
+  const content = fs.readFileSync(SETTINGS_FILE, 'utf8');
+  return JSON.parse(content);
 }
 
 export function updateTeamSettings(settings: any) {
-  teamSettings = { ...teamSettings, ...settings };
+  const currentSettings = getTeamSettings();
+  const newSettings = { ...currentSettings, ...settings };
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(newSettings, null, 2), 'utf8');
 }
 
 export function hasPermission(user: User, action: string, resource?: any): boolean {
